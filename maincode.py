@@ -81,7 +81,7 @@ def execute_query(query):
             df = pd.DataFrame(rows, columns=columns)
             return df, None
         else:
-            return None, f"Query executed successfully. {cursor.rowcount} rows affected."
+            return None, f"Query executed but check the result below. {cursor.rowcount} rows affected."
     except sqlite3.OperationalError as op_err:
         return None, f"SQL Operational Error: {op_err}"
     except Exception as e:
