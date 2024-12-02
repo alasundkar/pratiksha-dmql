@@ -95,7 +95,7 @@ st.title("SQLite Database Management App")
 init_db()
 
 # Sidebar menu
-menu = ["View Tables", "Execute Query", "Load CSV Data"]
+menu = ["View Tables", "Execute Query"]
 choice = st.sidebar.selectbox("Menu", menu)
 
 if choice == "View Tables":
