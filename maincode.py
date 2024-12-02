@@ -2,125 +2,122 @@ import streamlit as st
 import sqlite3
 import pandas as pd
 import os
-import threading
-
-# Lock for database operations
-db_lock = threading.Lock()
-
-# Get the current directory
-current_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Define the path to the SQLite database in /tmp directory (writable in Streamlit Cloud)
-sqlite_db = "/tmp/mydatabase.db"
-
-# SQL file paths (inside sql_queries directory)
-create_sql_path = os.path.join(current_dir, "sql_queries", "create.sql")
-alter_sql_path = os.path.join(current_dir, "sql_queries", "alter.sql")
-# Add other SQL files if needed
-# For example:
-# load_sql_path = os.path.join(current_dir, "sql_queries", "load.sql")
-
-# Directory containing the CSV files
-csv_directory = os.path.join(current_dir, "data_files")
 
 # Function to execute SQL file
 def execute_sql_file(file_path):
     try:
-        conn = sqlite3.connect(sqlite_db, check_same_thread=False)
+        # Connect to SQLite database
+        conn = sqlite3.connect('mydatabase.db')
         cursor = conn.cursor()
-
+        
         # Read and execute the SQL file
         with open(file_path, 'r') as sql_file:
             sql_script = sql_file.read()
-        cursor.executescript(sql_script)
+        cursor.executescript(sql_script)  # Use executescript for multiple SQL statements
         conn.commit()
-        print(f"SQL script {file_path} executed successfully!")
+        print("SQL script executed successfully!")
     except Exception as e:
-        print(f"An error occurred while executing the SQL file {file_path}: {e}")
+        print(f"An error occurred while executing the SQL file: {e}")
     finally:
         cursor.close()
         conn.close()
 
 # Initialize the database
 def init_db():
-    # Always initialize the database on app start
-    execute_sql_file(create_sql_path)
-    # If you have other SQL files, execute them as needed
-    # execute_sql_file(load_sql_path)
-    execute_sql_file(alter_sql_path)
-    load_csv_to_sqlite(csv_directory, sqlite_db)
+    # Execute the create.sql file to set up the tables
+ #   execute_sql_file("sql_queries/create.sql")  # Replace with the path to your create.sql file
+ #   execute_sql_file("sql_queries/load.sql")
+    execute_sql_file("sql_queries/alter.sql")
+init_db()
+
+# Directory containing the CSV files
+csv_directory = "data_files"  # Replace with the path to your CSV directory
+
+# SQLite database file
+sqlite_db = "mydatabase.db"  # Replace with your SQLite database file name
+
 
 def load_csv_to_sqlite(csv_directory, sqlite_db):
-    conn = sqlite3.connect(sqlite_db, check_same_thread=False)
+    # Connect to the SQLite database
+    conn = sqlite3.connect(sqlite_db)
     cursor = conn.cursor()
+
     try:
+        # Loop through all CSV files in the directory
         for filename in os.listdir(csv_directory):
-            if filename.endswith(".csv"):
+            if filename.endswith(".csv"):  # Check if the file is a CSV
                 file_path = os.path.join(csv_directory, filename)
+                
+                # Infer table name from the file name (remove .csv extension)
                 table_name = os.path.splitext(filename)[0]
+
+                # Load the CSV file into a Pandas DataFrame
                 df = pd.read_csv(file_path)
+
+                # Write the DataFrame to the SQLite database table
+                # Use if_exists='replace' to overwrite existing data
                 df.to_sql(table_name, conn, if_exists='replace', index=False)
+
                 print(f"Loaded {filename} into table {table_name}.")
     except Exception as e:
-        print(f"An error occurred while loading CSV files: {e}")
+        print(f"An error occurred: {e}")
     finally:
         cursor.close()
         conn.close()
 
+# Call the function to load CSV files into SQLite
+load_csv_to_sqlite(csv_directory, sqlite_db)
+
 # Function to execute SQL queries
 def execute_query(query):
-    with db_lock:
-        conn = sqlite3.connect(sqlite_db, check_same_thread=False)
-        try:
-            cursor = conn.cursor()
-            if query.strip().upper().startswith('SELECT'):
-                cursor.execute(query)
-                rows = cursor.fetchall()
-                columns = [desc[0] for desc in cursor.description]
-                df = pd.DataFrame(rows, columns=columns)
-                return df, None
-            else:
-                cursor.execute(query)
-                conn.commit()
-                return None, f"Query executed successfully. {cursor.rowcount} rows affected."
-        except Exception as e:
-            st.error(f"An error occurred: {e}")
-            return None, f"An error occurred: {e}"
-        finally:
-            cursor.close()
-            conn.close()
+    conn = sqlite3.connect(sqlite_db)
+    try:
+        cursor = conn.cursor()
+        cursor.execute(query)
+        conn.commit()
+        if query.strip().upper().startswith('SELECT'):
+            rows = cursor.fetchall()
+            columns = [desc[0] for desc in cursor.description]
+            df = pd.DataFrame(rows, columns=columns)
+            return df, None
+        else:
+            return None, f"Query executed successfully. {cursor.rowcount} rows affected."
+    except Exception as e:
+        return None, f"An error occurred: {e}"
+    finally:
+        cursor.close()
+        conn.close()
 
 # Streamlit app
 st.title("SQLite Database Management App")
 
-# Initialize the database every time the app runs (due to /tmp being cleared on restart)
+# Initialize the database
 init_db()
 
 # Sidebar menu
-menu = ["View Tables", "Execute Query"]
+menu = ["View Tables", "Execute Query", "Load CSV Data"]
 choice = st.sidebar.selectbox("Menu", menu)
 
 if choice == "View Tables":
     st.subheader("Available Tables")
-    with db_lock:
-        conn = sqlite3.connect(sqlite_db, check_same_thread=False)
-        try:
-            cursor = conn.cursor()
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-            tables = cursor.fetchall()
-            table_list = [table[0] for table in tables]
-            st.write("Tables in the database:", table_list)
+    conn = sqlite3.connect(sqlite_db)
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        tables = cursor.fetchall()
+        table_list = [table[0] for table in tables]
+        st.write("Tables in the database:", table_list)
 
-            selected_table = st.selectbox("Select a table to view", table_list)
-            if selected_table:
-                query = f"SELECT * FROM {selected_table} LIMIT 100"
-                df, _ = execute_query(query)
-                if df is not None:
-                    st.dataframe(df)
-        except Exception as e:
-            st.error(f"An error occurred: {e}")
-        finally:
-            conn.close()
+        selected_table = st.selectbox("Select a table to view", table_list)
+        if selected_table:
+            query = f"SELECT * FROM {selected_table} LIMIT 100"
+            df, _ = execute_query(query)
+            if df is not None:
+                st.dataframe(df)
+    except Exception as e:
+        st.error(f"An error occurred: {e}")
+    finally:
+        conn.close()
 
 elif choice == "Execute Query":
     st.subheader("Run SQL Query")
@@ -136,3 +133,10 @@ elif choice == "Execute Query":
                 st.write("Query executed successfully. No results to display.")
         else:
             st.warning("Please enter a SQL query.")
+
+elif choice == "Load CSV Data":
+    st.subheader("Load CSV Files into Database")
+    csv_directory = st.text_input("Enter the path to your CSV directory:", "data_files")
+    if st.button("Load CSVs"):
+        load_csv_to_sqlite(csv_directory)
+        st.success("CSV files loaded successfully!")
