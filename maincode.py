@@ -82,11 +82,14 @@ def execute_query(query):
             return df, None
         else:
             return None, f"Query executed successfully. {cursor.rowcount} rows affected."
+    except sqlite3.OperationalError as op_err:
+        return None, f"SQL Operational Error: {op_err}"
     except Exception as e:
         return None, f"An error occurred: {e}"
     finally:
         cursor.close()
         conn.close()
+
 
 # Streamlit app
 st.title("SQLite Database Management App")
@@ -122,6 +125,7 @@ if choice == "View Tables":
 elif choice == "Execute Query":
     st.subheader("Run SQL Query")
     query = st.text_area("Enter your SQL query:")
+    
     if st.button("Execute"):
         if query.strip():
             df_result, message = execute_query(query)
@@ -131,6 +135,22 @@ elif choice == "Execute Query":
                 st.dataframe(df_result)
             elif df_result is not None:
                 st.write("Query executed successfully. No results to display.")
+                st.info(df_result)
+            else:
+                st.warning("No data inserted or updated. Check your query.")
+                st.warning(df_result)
         else:
             st.warning("Please enter a SQL query.")
+
+    # if st.button("Execute"):
+    #     if query.strip():
+    #         df_result, message = execute_query(query)
+    #         if message:
+    #             st.info(message)
+    #         if df_result is not None and not df_result.empty:
+    #             st.dataframe(df_result)
+    #         elif df_result is not None:
+    #             st.write("Query executed successfully. No results to display.")
+    #     else:
+    #         st.warning("Please enter a SQL query.")
 
