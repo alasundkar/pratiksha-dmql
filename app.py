@@ -44,12 +44,12 @@
 # if __name__ == '__main__':
 #     app.run(debug=True)
 
-#from flask import Flask, render_template, request
+from flask import Flask, render_template, request
 import sqlite3
 import pandas as pd
 import os
-import streamlit as st
-#app = Flask(__name__)
+
+app = Flask(__name__)
 
 # SQLite database file
 DATABASE = 'mydatabase1.db'  # Ensure this matches your database file name
@@ -134,38 +134,18 @@ def execute_query(query):
         cursor.close()
         conn.close()
 
-# @app.route('/', methods=['GET', 'POST'])
-# def index():
-#     query = ''
-#     result = None
-#     message = ''
-#     if request.method == 'POST':
-#         query = request.form['query']
-#         if query.strip():
-#             result, message = execute_query(query)
-#         else:
-#             message = "Please enter a SQL query."
-#     return render_template('index.html', query=query, result=result, message=message)
-
-# if __name__ == '__main__':
-#     app.run(debug=True)
-
-# Streamlit app
-def main():
-    st.title("SQLite Database Management App")
-
-    query = st.text_area("Enter your SQL query:")
-    if st.button("Execute"):
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    query = ''
+    result = None
+    message = ''
+    if request.method == 'POST':
+        query = request.form['query']
         if query.strip():
-            df_result, message = execute_query(query)
-            if message:
-                st.info(message)
-            if df_result is not None and not df_result.empty:
-                st.dataframe(df_result)
-            elif df_result is not None:
-                st.write("Query executed successfully. No results to display.")
+            result, message = execute_query(query)
         else:
-            st.warning("Please enter a SQL query.")
+            message = "Please enter a SQL query."
+    return render_template('index.html', query=query, result=result, message=message)
 
 if __name__ == '__main__':
-    main()
+    app.run(debug=True)
