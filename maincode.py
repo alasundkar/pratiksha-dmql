@@ -3,11 +3,46 @@ import sqlite3
 import pandas as pd
 import os
 
+import os
+
+
+
+
+
+# # Function to execute SQL file
+# def execute_sql_file(file_path):
+#     try:
+#         # Connect to SQLite database
+#         conn = sqlite3.connect('mydatabase.db')
+#         cursor = conn.cursor()
+        
+#         # Read and execute the SQL file
+#         with open(file_path, 'r') as sql_file:
+#             sql_script = sql_file.read()
+#         cursor.executescript(sql_script)  # Use executescript for multiple SQL statements
+#         conn.commit()
+#         print("SQL script executed successfully!")
+#     except Exception as e:
+#         print(f"An error occurred while executing the SQL file: {e}")
+#     finally:
+#         cursor.close()
+#         conn.close()
+
+# # Initialize the database
+# def init_db():
+#     # Execute the create.sql file to set up the tables
+#  #   execute_sql_file("sql_queries/create.sql")  # Replace with the path to your create.sql file
+#  #   execute_sql_file("sql_queries/load.sql")
+#     execute_sql_file("sql_queries/alter.sql")
+# init_db()
+
+sqlite_db = os.path.join(tempfile.gettempdir(), "mydatabase.db")
+
 # Function to execute SQL file
 def execute_sql_file(file_path):
     try:
         # Connect to SQLite database
-        conn = sqlite3.connect('mydatabase.db')
+        conn = sqlite3.connect(sqlite_db)
         cursor = conn.cursor()
         
         # Read and execute the SQL file
@@ -22,19 +57,28 @@ def execute_sql_file(file_path):
         cursor.close()
         conn.close()
 
+# SQLite database file
+
 # Initialize the database
 def init_db():
     # Execute the create.sql file to set up the tables
- #   execute_sql_file("sql_queries/create.sql")  # Replace with the path to your create.sql file
- #   execute_sql_file("sql_queries/load.sql")
+    execute_sql_file("sql_queries/create.sql") 
     execute_sql_file("sql_queries/alter.sql")
 init_db()
+
+
+
+
+
+
+
+
 
 # Directory containing the CSV files
 csv_directory = "data_files"  # Replace with the path to your CSV directory
 
 # SQLite database file
-sqlite_db = "mydatabase.db"  # Replace with your SQLite database file name
+#sqlite_db = "mydatabase.db"  # Replace with your SQLite database file name
 
 
 def load_csv_to_sqlite(csv_directory, sqlite_db):
