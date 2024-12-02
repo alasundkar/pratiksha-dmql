@@ -134,9 +134,3 @@ elif choice == "Execute Query":
         else:
             st.warning("Please enter a SQL query.")
 
-elif choice == "Load CSV Data":
-    st.subheader("Load CSV Files into Database")
-    csv_directory = st.text_input("Enter the path to your CSV directory:", "data_files")
-    if st.button("Load CSVs"):
-        load_csv_to_sqlite(csv_directory)
-        st.success("CSV files loaded successfully!")
