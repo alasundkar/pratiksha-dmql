@@ -17,7 +17,7 @@ CREATE TABLE category (
     category_id TEXT PRIMARY KEY,       -- Custom ID like 'ct1', 'ct2', etc.
     category TEXT NOT NULL,
     title TEXT NOT NULL,
-    type TEXT NOT NULL,
+    rating TEXT NOT NULL,
     duration TEXT
 );
 
