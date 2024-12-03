@@ -2,36 +2,189 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SQLite Database Management App</title>
+    <title>Netflix Database Management App</title>
     <style>
         /* Basic styling */
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        textarea { width: 100%; height: 150px; }
-        input[type="submit"] { padding: 10px 20px; margin-top: 10px; }
-        .message { margin-top: 20px; }
-        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-        th, td { border: 1px solid #dddddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        .error { color: red; }
-        .success { color: green; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            color: #333;
+        }
+        header {
+            background-color: #2a9d8f; /* Calm teal color */
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+        header h2 {
+            margin: 5px 0 0;
+            font-weight: normal;
+            font-size: 18px;
+        }
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .example-queries {
+            background-color: #fff; /* White background for contrast */
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .example-queries h3 {
+            margin-top: 0;
+            font-size: 24px;
+            color: #264653; /* Deep blue-green color */
+        }
+        .query {
+            background-color: #e9f5f2; /* Light teal background */
+            padding: 15px;
+            border-left: 5px solid #2a9d8f;
+            margin-bottom: 15px;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+        .query:last-child {
+            margin-bottom: 0;
+        }
+        form {
+            background-color: #fff; /* White background */
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 18px;
+            color: #264653;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+        input[type="submit"] {
+            background-color: #2a9d8f;
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #21867a;
+        }
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .error {
+            background-color: #ffe6e6;
+            color: #a94442;
+            border-left: 5px solid #a94442;
+        }
+        .success {
+            background-color: #e6ffe6;
+            color: #3c763d;
+            border-left: 5px solid #3c763d;
+        }
+        .result {
+            margin-top: 30px;
+            overflow-x: auto;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            background-color: #fff; /* White background */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 14px;
+        }
+        th {
+            background-color: #2a9d8f; /* Matching header color */
+            color: #fff;
+            position: sticky;
+            top: 0;
+        }
+        @media (max-width: 600px) {
+            .query, textarea {
+                font-size: 14px;
+            }
+            label {
+                font-size: 16px;
+            }
+            input[type="submit"] {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>SQLite Database Management App</h1>
-    <form method="post">
-        <label for="query">Enter your SQL query:</label><br>
-        <textarea name="query" id="query">{{ query }}</textarea><br>
-        <input type="submit" value="Execute">
-    </form>
-    {% if message %}
-    <div class="message">
-        <p>{{ message }}</p>
+    <header>
+        <h1>Netflix Database Management App</h1>
+        <h2>GROUP 4: Pratiksha Pawar,  Amulya Reddy</h2>
+    </header>
+
+    <div class="container">
+        <div class="example-queries">
+            <h3>Example Queries:</h3>
+            <div class="query">
+                INSERT INTO shows (show_id, title, director, actor, country, category, type, rating, duration)<br>
+                VALUES ('s10001', 'New Show', 'John Doe', 'Jane Smith', 'USA', 'Drama', 'Movie', 'PG', '90 min');
+            </div>
+            <div class="query">
+                SELECT * FROM shows WHERE show_id='s10001';
+            </div>
+            <div class="query">
+                DELETE FROM shows WHERE show_id = 's10001';
+            </div>
+            <div class="query">
+                UPDATE shows SET rating = 'PG-13' WHERE show_id = 's10001';
+            </div>
+        </div>
+
+        <form method="post">
+            <label for="query">Enter your SQL query:</label>
+            <textarea name="query" id="query">{{ query }}</textarea>
+            <input type="submit" value="Execute">
+        </form>
+
+        {% if message %}
+        <div class="message {% if 'error' in message.lower() %}error{% else %}success{% endif %}">
+            <p>{{ message }}</p>
+        </div>
+        {% endif %}
+
+        {% if result %}
+        <div class="result">
+            {{ result|safe }}
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
-    {% if result %}
-    <div class="result">
-        {{ result|safe }}
-    </div>
-    {% endif %}
 </body>
 </html>
