@@ -1,49 +1,3 @@
-# from flask import Flask, render_template, request
-# import sqlite3
-# import pandas as pd
-# import os
- 
-# app = Flask(__name__)
-
-# # SQLite database file
-# DATABASE = 'mydatabase.db'  # Ensure this matches your database file name
-
-# # Function to execute SQL queries
-# def execute_query(query):
-#     conn = sqlite3.connect(DATABASE)
-#     try:
-#         cursor = conn.cursor()
-#         cursor.execute(query)
-#         conn.commit()
-#         if query.strip().upper().startswith('SELECT'):
-#             rows = cursor.fetchall()
-#             columns = [description[0] for description in cursor.description]
-#             df = pd.DataFrame(rows, columns=columns)
-#             return df.to_html(index=False), None  # Convert DataFrame to HTML table
-#         else:
-#             return None, f"Query executed successfully. {cursor.rowcount} rows affected."
-#     except Exception as e:
-#         return None, f"An error occurred: {e}"
-#     finally:
-#         cursor.close()
-#         conn.close()
-
-# @app.route('/', methods=['GET', 'POST'])
-# def index():
-#     query = ''
-#     result = None
-#     message = ''
-#     if request.method == 'POST':
-#         query = request.form['query']
-#         if query.strip():
-#             result, message = execute_query(query)
-#         else:
-#             message = "Please enter a SQL query."
-#     return render_template('index.html', query=query, result=result, message=message)
-
-# if __name__ == '__main__':
-#     app.run(debug=True)
-
 from flask import Flask, render_template, request
 import sqlite3
 import pandas as pd
@@ -52,7 +6,7 @@ import os
 app = Flask(__name__)
 
 # SQLite database file
-DATABASE = 'mydatabase1.db'  # Ensure this matches your database file name
+DATABASE = 'netflixdata.db'  # Ensure this matches your database file name
 
 # Function to execute SQL file
 def execute_sql_file(file_path):
